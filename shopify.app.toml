@@ -1,0 +1,23 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "f7a6b29cc7b2bc55c0b0e23b01fa97db"
+name = "booking-service-app"
+application_url = "https://booking-service-app.fly.dev"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-07"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://booking-service-app.fly.dev/auth/callback",
+  "https://booking-service-app.fly.dev/auth/shopify/callback",
+  "https://booking-service-app.fly.dev/api/auth/callback"
+]
