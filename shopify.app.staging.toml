@@ -1,0 +1,25 @@
+# Staging Partner app — separate from live (shopify.app.toml).
+# One-time: npm run config:link:staging  (creates/links a NEW Partner app, fills client_id)
+# Deploy config: npm run deploy:staging
+# Never run deploy:staging against live; never point this file at the live Fly URL.
+
+client_id = "REPLACE_AFTER_CONFIG_LINK"
+name = "booking-service-app-staging"
+application_url = "https://booking-service-app-staging.fly.dev"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-07"
+
+[access_scopes]
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://booking-service-app-staging.fly.dev/auth/callback",
+  "https://booking-service-app-staging.fly.dev/auth/shopify/callback",
+  "https://booking-service-app-staging.fly.dev/api/auth/callback"
+]
