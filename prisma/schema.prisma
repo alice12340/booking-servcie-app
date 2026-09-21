@@ -38,6 +38,9 @@ model Session {
 }
 
 
+// Appointment.status funnel values:
+// pending | arrived | completed | voucher_issued | voucher_redeemed
+// (legacy "confirmed" treated as arrived where needed)
 model Appointment {
   id                String    @id @default(cuid())
   customerName      String
@@ -53,6 +56,10 @@ model Appointment {
   notes             String?
   products          String?   // JSON 字符串
   status            String    @default("pending")
+  arrivedAt         DateTime?
+  completedAt       DateTime?
+  voucherIssuedAt   DateTime?
+  voucherRedeemedAt DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

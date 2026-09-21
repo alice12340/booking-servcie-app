@@ -168,7 +168,7 @@ export async function sendAppointmentEmails(appointment: any) {
     storeAddress: appointment.storeAddress || '',
     // storeLat: appointment.storeLat || '',
     // storeLng: appointment.storeLng || '',
-    confirmUrl: `${process.env.APP_URL}/api/appointments/confirm/${appointment.id}`,
+    confirmUrl: `${(process.env.APP_URL || process.env.SHOPIFY_APP_URL || "").replace(/\/+$/, "")}/api/appointments/confirm/${appointment.id}`,
   }
 
   const results = { customer: false, dealer: false }
