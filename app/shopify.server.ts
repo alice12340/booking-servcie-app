@@ -6,6 +6,7 @@ import {
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
+import { isUiPreviewEnabled } from "./utils/ui-preview.server";
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -27,7 +28,22 @@ const shopify = shopifyApp({
 export default shopify;
 export const apiVersion = ApiVersion.October25;
 export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
-export const authenticate = shopify.authenticate;
+
+/** Skips Shopify OAuth when ALLOW_UI_PREVIEW=1 on staging only. */
+export const authenticate = {
+  ...shopify.authenticate,
+  admin: async (request: Request) => {
+    if (isUiPreviewEnabled()) {
+      return {
+        session: null,
+        admin: null,
+        redirect: undefined,
+      } as Awaited<ReturnType<typeof shopify.authenticate.admin>>;
+    }
+    return shopify.authenticate.admin(request);
+  },
+};
+
 export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
