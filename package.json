@@ -12,6 +12,7 @@
     "deploy:staging": "shopify app deploy --config shopify.app.staging.toml",
     "deploy:fly": "node scripts/fly.mjs deploy --config fly.toml --remote-only",
     "deploy:fly:staging": "node scripts/fly.mjs deploy --config fly.staging.toml --remote-only",
+    "seed:demo": "node scripts/seed-demo-appointments.mjs",
     "config:use": "shopify app config use",
     "env": "shopify app env",
     "env:staging": "shopify app env --config shopify.app.staging.toml",
