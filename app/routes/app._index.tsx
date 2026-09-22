@@ -3,6 +3,10 @@ import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useSearchParams } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
+import {
+  buildAppointmentWhere,
+  parseAppointmentListParams,
+} from "../utils/appointments-query.server";
 
 const FUNNEL_STATUSES = [
   { key: "pending", label: "Booked" },
@@ -72,33 +76,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
 
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1");
-  const limit = parseInt(url.searchParams.get("limit") || "20");
-  const status = url.searchParams.get("status") || "";
-  const customerEmail = url.searchParams.get("customerEmail") || "";
-  const dealerEmail = url.searchParams.get("dealerEmail") || "";
-  const storeName = url.searchParams.get("storeName") || "";
-  const sortBy = url.searchParams.get("sortBy") === "createdAt" ? "createdAt" : "appointmentDate";
-  const sortDir = url.searchParams.get("sortDir") === "asc" ? "asc" : "desc";
-
+  const { filters, sort, page, limit } = parseAppointmentListParams(url.searchParams);
   const skip = (page - 1) * limit;
-  const where: any = {};
-
-  if (status === "arrived") {
-    where.status = { in: ["arrived", "confirmed"] };
-  } else if (status) {
-    where.status = status;
-  }
-  if (customerEmail) where.customerEmail = { contains: customerEmail };
-  if (dealerEmail) where.dealerEmail = { contains: dealerEmail };
-  if (storeName) where.storeName = { contains: storeName };
+  const where = buildAppointmentWhere(filters);
 
   const [appointments, total, funnel] = await Promise.all([
     prisma.appointment.findMany({
       where,
       skip,
       take: limit,
-      orderBy: { [sortBy]: sortDir },
+      orderBy: { [sort.sortBy]: sort.sortDir },
     }),
     prisma.appointment.count({ where }),
     loadFunnelCounts(),
@@ -112,8 +99,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       total,
       totalPages: Math.ceil(total / limit),
     },
-    filters: { status, customerEmail, dealerEmail, storeName },
-    sort: { sortBy, sortDir },
+    filters,
+    sort,
     funnel,
   };
 };
@@ -142,6 +129,17 @@ export default function AppointmentsPage() {
   const clearFilters = () => {
     setLocalFilters({ status: "", customerEmail: "", dealerEmail: "", storeName: "" });
     setSearchParams(new URLSearchParams());
+  };
+
+  const exportCsv = () => {
+    const params = new URLSearchParams();
+    if (localFilters.status) params.set("status", localFilters.status);
+    if (localFilters.customerEmail) params.set("customerEmail", localFilters.customerEmail);
+    if (localFilters.dealerEmail) params.set("dealerEmail", localFilters.dealerEmail);
+    if (localFilters.storeName) params.set("storeName", localFilters.storeName);
+    if (sort.sortBy !== "appointmentDate") params.set("sortBy", sort.sortBy);
+    if (sort.sortDir !== "desc") params.set("sortDir", sort.sortDir);
+    window.location.assign(`/appointments/export?${params.toString()}`);
   };
 
   const goToPage = (page: number) => {
@@ -288,11 +286,17 @@ export default function AppointmentsPage() {
               />
             </div>
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
             <s-button onClick={applyFilters}>Apply Filters</s-button>
             <s-button onClick={clearFilters} variant="tertiary">
               Clear
             </s-button>
+            <s-button onClick={exportCsv} variant="secondary">
+              Export CSV
+            </s-button>
+            <span style={{ fontSize: "12px", color: "#6d7175" }}>
+              All matching rows (not just this page)
+            </span>
           </div>
         </div>
 
