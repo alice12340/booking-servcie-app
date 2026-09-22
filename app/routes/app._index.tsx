@@ -286,17 +286,24 @@ export default function AppointmentsPage() {
               />
             </div>
           </div>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-            <s-button onClick={applyFilters}>Apply Filters</s-button>
-            <s-button onClick={clearFilters} variant="tertiary">
-              Clear
-            </s-button>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+              <s-button onClick={applyFilters}>Apply Filters</s-button>
+              <s-button onClick={clearFilters} variant="tertiary">
+                Clear
+              </s-button>
+            </div>
             <s-button onClick={exportCsv} variant="secondary">
               Export CSV
             </s-button>
-            <span style={{ fontSize: "12px", color: "#6d7175" }}>
-              All matching rows (not just this page)
-            </span>
           </div>
         </div>
 
