@@ -12,6 +12,8 @@ primary_region = 'lax'
   SCOPES = ''
   # Set after creating the staging Partner app (must NOT reuse live client_id):
   #   flyctl secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... --config fly.staging.toml
+  # TODO
+  SHOPIFY_API_KEY = 'f7a6b29cc7b2bc55c0b0e23b01fa97db'
   SHOPIFY_APP_URL = 'https://booking-service-app-staging.fly.dev'
 
 [processes]
